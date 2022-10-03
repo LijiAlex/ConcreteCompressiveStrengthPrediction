@@ -1,5 +1,5 @@
-from src.logger import logging
-from src.exception import ConcreteException
+from concrete_src.logger import logging
+from concrete_src.exception import ConcreteException
 import sys
 
 
