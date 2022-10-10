@@ -13,8 +13,6 @@ CONFIG_DIR = 'config'
 CONFIG_FILE = 'config.yaml'
 CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, CONFIG_FILE)
 
-
-
 # training pipeline config
 TRAINING_PIPELINE_CONFIG_KEY = "training_pipeline_config"
 TRAINING_PIPELINE_ARTIFACT_DIR_KEY = "artifact_dir"
@@ -22,13 +20,11 @@ TRAINING_PIPELINE_NAME_KEY = "pipeline_name"
 
 # data ingestion config
 DATA_INGESTION_CONFIG_KEY = "data_ingestion_config"
-DATA_INGESTION_DATASET_URL = "dataset_download_url"
-DATA_INGESTION_RAW_DATA_DIR = "raw_data_dir"
-DATA_INGESTION_TGZ_DIR = "tgz_download_dir"
-DATA_INGESTION_DIR_NAME_KEY = "ingested_dir"
-DATA_INGESTION_TRAIN_DIR = "ingested_train_dir"
-DATA_INGESTION_TEST_DIR = "ingested_test_dir"
+DATASET_NAME = "dataset_name"
+DATASET_FILENAME = "dataset_file_name"
 DATA_INGESTION_ARTIFACT_DIR = "data_ingestion"
+DATA_INGESTION_RAW_DATA_DIR = "raw_data_dir"
+
 
 # data validation config
 DATA_VALIDATION_CONFIG_KEY = "data_validation_config"

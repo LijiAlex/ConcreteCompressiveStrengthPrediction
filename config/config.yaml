@@ -6,9 +6,6 @@ data_ingestion_config:
   dataset_name: elikplim/concrete-compressive-strength-data-set
   dataset_file_name: concrete_data.csv
   raw_data_dir: raw_data
-  ingested_dir: ingested_data
-  ingested_train_dir: train
-  ingested_test_dir: test 
 
 data_validation_config:
   schema_dir: config
