@@ -44,7 +44,7 @@ class DataIngestion:
             logging.info(f"Download completed. File {raw_data_file_path} downloaded successfully")
             
             data_ingestion_artifact = DataIngestionArtifact(
-                data_file_path = raw_data_file_path,
+                raw_data_file_path = raw_data_file_path,
                 is_ingested = True, 
                 message = "Data ingested successfully")
             logging.info(f"DataIngestionArtifact: [{data_ingestion_artifact}]")
@@ -68,6 +68,6 @@ class DataIngestion:
         """
         Acts as destructor. Called before all references to the class object are deleted.
         """
-        logging.info(f"{'*' *25} Data Ingestion completed {'*' *25}")
+        logging.info(f"{'*' *25} Data Ingestion completed {'*' *25}\n")
 
 

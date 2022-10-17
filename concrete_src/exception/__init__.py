@@ -1,5 +1,6 @@
 import os
 import sys
+from concrete_src.logger import logging
 
 class ConcreteException(Exception):
     
@@ -13,6 +14,7 @@ class ConcreteException(Exception):
         self.error_message=ConcreteException.get_detailed_error_message(error_message=error_message,
                                                                        error_detail=error_detail
                                                                         )
+        logging.error(self.error_message)
 
     @staticmethod
     def get_detailed_error_message(error_message:Exception,error_detail:sys)->str:

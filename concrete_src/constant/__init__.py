@@ -30,9 +30,6 @@ DATA_INGESTION_RAW_DATA_DIR = "raw_data_dir"
 DATA_VALIDATION_CONFIG_KEY = "data_validation_config"
 DATA_VALIDATION_SCHEMA_DIR = "schema_dir"
 DATA_VALIDATION_SCHEMA_FILE_NAME = "schema_file_name"
-DATA_VALIDATION_ARTIFACT_DIR = "data_validation"
-DATA_VALIDATION_REPORT_NAME = "report_file_name"
-DATA_VALIDATION_REPORT_PAGE_NAME = "report_page_file_name"
 
 # data transformation config
 DATA_TRANSFORMATION_CONFIG_KEY = "data_transformation_config"
@@ -70,11 +67,6 @@ MODEL_EXPORT_DIR = "model_export_dir"
 # schema.yaml
 SCHEMA_FILE_COLUMNS_KEY = "columns"
 SCHEMA_FILE_TARGET_COLUMNS = "target_column"
-SCHEMA_FILE_DOMAIN_VALUES_KEY = "domain_value"
-COLUMN_TOTAL_ROOMS = "total_rooms"
-COLUMN_TOTAL_BEDROOM = "total_bedrooms"
-COLUMN_POPULATION = "population"
-COLUMN_HOUSEHOLDS = "households"
 
 # experiment.yaml
 EXPERIMENT_DIR_NAME="experiment"

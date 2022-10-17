@@ -1,0 +1,12 @@
+columns:
+  cement: float
+  blast_furnace_slag: float
+  fly_ash: float
+  water: float
+  superplasticizer: float
+  coarse_aggregate: float
+  fine_aggregate : float
+  age: int64
+  concrete_compressive_strength: float
+
+target_column: concrete_compressive_strength

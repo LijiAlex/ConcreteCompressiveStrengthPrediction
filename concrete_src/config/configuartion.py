@@ -65,3 +65,20 @@ class Configuration:
             return data_ingestion_config_info
         except Exception as e:
             raise ConcreteException(e, sys) from e
+
+    def get_data_validation_config(self)->DataValidationConfig:
+        """
+        Reads data validation configuration
+        Returns:
+            DataValidationConfig
+        """
+        try:
+            data_validation_config_info = self.config_info[DATA_VALIDATION_CONFIG_KEY]
+            data_validation_schema_file_name = data_validation_config_info[DATA_VALIDATION_SCHEMA_FILE_NAME]
+            file_path = os.path.join(ROOT_DIR, data_validation_config_info[DATA_VALIDATION_SCHEMA_DIR], data_validation_schema_file_name)
+            data_validation_config_info = DataValidationConfig(
+                schema_file_path = file_path) 
+            logging.info(f"DataValidationConfig: {data_validation_config_info}")
+            return data_validation_config_info
+        except Exception as e:
+            raise ConcreteException(e, sys)  from e
