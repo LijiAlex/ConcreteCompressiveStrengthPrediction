@@ -3,3 +3,5 @@ pyYAML
 gunicorn
 pandas
 sklearn
+matplotlib
+seaborn
