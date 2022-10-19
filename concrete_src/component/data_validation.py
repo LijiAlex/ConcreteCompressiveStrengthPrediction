@@ -36,9 +36,9 @@ class DataValidation:
             logging.info(f"Checking if input file exists")
             is_file_exists = False
 
-            is_file_exists = os.path.exists(self.data_ingestion_artifact.raw_data_file_path)
+            is_file_exists = os.path.exists(self.data_ingestion_artifact.train_file_path)
 
-            logging.info(f"Input File [{self.data_ingestion_artifact.raw_data_file_path}] exists? {is_file_exists}")
+            logging.info(f"Input File [{self.data_ingestion_artifact.train_file_path}] exists? {is_file_exists}")
 
             if not (is_file_exists):
                 raise Exception(f"Input file not available")
@@ -58,7 +58,7 @@ class DataValidation:
             schema_info = read_yaml_file(file_path = schema_file_path)
             schema_columns = OrderedDict(sorted(schema_info["columns"].items()))
             logging.info(f"Schema Info: {schema_columns}")
-            input_data = pd.read_csv(self.data_ingestion_artifact.raw_data_file_path)  
+            input_data = pd.read_csv(self.data_ingestion_artifact.train_file_path)  
             logging.info(f"Data Columns: {input_data.columns.sort_values()}")         
             if len(schema_columns) == input_data.shape[1]:
                 logging.info(f"Validated no. of columns: {input_data.shape[1]}")

@@ -24,7 +24,8 @@ DATASET_NAME = "dataset_name"
 DATASET_FILENAME = "dataset_file_name"
 DATA_INGESTION_ARTIFACT_DIR = "data_ingestion"
 DATA_INGESTION_RAW_DATA_DIR = "raw_data_dir"
-
+DATA_INGESTION_DIR_NAME_KEY = "ingested_dir"
+DATA_INGESTION_TRAIN_DIR = "ingested_train_dir"
 
 # data validation config
 DATA_VALIDATION_CONFIG_KEY = "data_validation_config"
@@ -34,10 +35,8 @@ DATA_VALIDATION_SCHEMA_FILE_NAME = "schema_file_name"
 # data transformation config
 DATA_TRANSFORMATION_CONFIG_KEY = "data_transformation_config"
 DATA_TRANSFORMATION_ARTIFACT_DIR = "data_transformation"
-ADD_BEDROOM_PER_ROOM_KEY = "add_bedroom_per_room"
 TRANFORMED_DIR = "transformed_dir"
 TRANSFORMED_TRAIN_DIR = "transformed_train_dir"
-TRANSFORMED_TEST_DIR = "transformed_test_dir"
 PREPROCESSING_DIR = "preprocessing_dir"
 PREPROCESSED_OBJECT_FILE_NAME = "preprocessed_object_file_name"
 

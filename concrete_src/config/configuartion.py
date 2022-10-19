@@ -50,15 +50,18 @@ class Configuration:
             DataIngestionConfig
             """
             data_ingestion_config_info = self.config_info[DATA_INGESTION_CONFIG_KEY]
-            data_ingestion_artifact_dir = os.path.join(self.get_training_pipeline_config().artifact_dir, DATA_INGESTION_ARTIFACT_DIR, self.time_stamp) 
+            data_ingestion_artifact_dir = os.path.join(self.training_pipeline_config.artifact_dir, DATA_INGESTION_ARTIFACT_DIR, self.time_stamp) 
             dataset_name = data_ingestion_config_info[DATASET_NAME]
             dataset_filename = data_ingestion_config_info[DATASET_FILENAME]
             raw_data = os.path.join(data_ingestion_artifact_dir,data_ingestion_config_info[DATA_INGESTION_RAW_DATA_DIR])
-            
+            injested_data_dir = os.path.join(data_ingestion_artifact_dir, data_ingestion_config_info[DATA_INGESTION_DIR_NAME_KEY])
+            train_dir = os.path.join(injested_data_dir, data_ingestion_config_info[DATA_INGESTION_TRAIN_DIR])
+
             data_ingestion_config_info = DataIngestionConfig(
                 dataset_name = dataset_name, 
                 dataset_filename = dataset_filename,
-                raw_data_dir=raw_data
+                raw_data_dir=raw_data,
+                ingested_train_dir=train_dir
                 )
                 
             logging.info(f"DataIngestionConfig: {data_ingestion_config_info}")
@@ -82,3 +85,26 @@ class Configuration:
             return data_validation_config_info
         except Exception as e:
             raise ConcreteException(e, sys)  from e
+
+    def get_data_transformation_config(self)->DataTransformationConfig:
+        """
+        Reads data transformation configuration
+        Returns:
+            DataTransformationConfig
+        """
+        try:
+            data_transformation_config_info = self.config_info[DATA_TRANSFORMATION_CONFIG_KEY]
+            data_transformation_artifact_dir = os.path.join(self.training_pipeline_config.artifact_dir, DATA_TRANSFORMATION_ARTIFACT_DIR, self.time_stamp) 
+            transformed_dir = os.path.join(data_transformation_artifact_dir, TRANFORMED_DIR)
+            transformed_train_dir = os.path.join(transformed_dir, data_transformation_config_info[TRANSFORMED_TRAIN_DIR])
+            preprocessing_dir = os.path.join(data_transformation_artifact_dir, PREPROCESSING_DIR)
+            preprocessed_file_name = os.path.join(preprocessing_dir, data_transformation_config_info[PREPROCESSED_OBJECT_FILE_NAME] )
+
+            data_transformation_config_info = DataTransformationConfig(
+                transformed_train_dir = transformed_train_dir, 
+                preprocessed_object_file_path = preprocessed_file_name
+                )
+            logging.info(f"DataTransformationConfig: {data_transformation_config_info}")
+            return data_transformation_config_info
+        except Exception as e:
+            raise ConcreteException(e, sys) from e

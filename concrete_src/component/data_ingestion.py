@@ -42,9 +42,18 @@ class DataIngestion:
             api.dataset_download_file(dataset = dataset_name, file_name = dataset_filename, path = raw_data_dir)
             raw_data_file_path = os.path.join(raw_data_dir,dataset_filename)
             logging.info(f"Download completed. File {raw_data_file_path} downloaded successfully")
+            train_file_path = os.path.join(self.data_ingestion_config.ingested_train_dir,
+                                            dataset_filename)
+            # create folders and save data
+            logging.info(f"Exporting training data to [{train_file_path}] after removing space in columns")
+            os.makedirs(self.data_ingestion_config.ingested_train_dir, exist_ok=True)
+            raw_data = pd.read_csv(raw_data_file_path)
+            for column in raw_data.columns:
+                raw_data.rename(columns={column: column.strip()}, inplace=True)
+            raw_data.to_csv(train_file_path, index=False)
             
             data_ingestion_artifact = DataIngestionArtifact(
-                raw_data_file_path = raw_data_file_path,
+                train_file_path  = train_file_path, 
                 is_ingested = True, 
                 message = "Data ingested successfully")
             logging.info(f"DataIngestionArtifact: [{data_ingestion_artifact}]")
