@@ -13,6 +13,14 @@ CONFIG_DIR = 'config'
 CONFIG_FILE = 'config.yaml'
 CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, CONFIG_FILE)
 
+# model.yaml
+MODEL_CONFIG_GRID_SEARCH_KEY = 'grid_search'
+MODEL_CONFIG_MODULE_KEY = 'module'
+MODEL_CONFIG_CLASS_KEY = 'class'
+MODEL_CONFIG_PARAM_KEY = 'params'
+MODEL_CONFIG_SUPPLIED_MODELS = 'models'
+MODEL_CONFIG_PARAM_GRID_KEY = "search_param_grid"
+
 # training pipeline config
 TRAINING_PIPELINE_CONFIG_KEY = "training_pipeline_config"
 TRAINING_PIPELINE_ARTIFACT_DIR_KEY = "artifact_dir"

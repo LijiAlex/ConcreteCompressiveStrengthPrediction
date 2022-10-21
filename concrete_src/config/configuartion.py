@@ -108,3 +108,35 @@ class Configuration:
             return data_transformation_config_info
         except Exception as e:
             raise ConcreteException(e, sys) from e
+
+    def get_model_train_config(self)->ModelTrainerConfig:
+        """
+        Reads model trainer configuration details
+        Returns:
+            ModelTrainerConfig
+        """
+        try:
+            model_train_config_info = self.config_info[MODEL_TRAINER_CONFIG_INFO]
+            artifact_dir = self.training_pipeline_config.artifact_dir
+
+            model_trainer_artifact_dir=os.path.join(
+                artifact_dir,
+                MODEL_TRAINER_ARTIFACT_DIR,
+                self.time_stamp
+            )
+            trained_models_path = os.path.join(model_trainer_artifact_dir, TRAINED_MODEL_DIR, self.time_stamp)
+            base_accuracy = model_train_config_info[BASE_ACCURACY]
+
+            model_config_file_path = os.path.join(model_train_config_info[MODEL_CONFIG_DIR],
+            model_train_config_info[MODEL_CONFIG_FILE_NAME]
+            )
+
+            model_train_config_info = ModelTrainerConfig(
+                trained_models_path = trained_models_path, 
+                base_accuracy = base_accuracy,
+                model_config_file_path = model_config_file_path
+                )
+            logging.info(f"ModelTrainingConfig: {model_train_config_info}")
+            return model_train_config_info
+        except Exception as e:
+            raise ConcreteException(e, sys) from e

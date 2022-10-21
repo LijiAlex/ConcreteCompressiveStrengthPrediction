@@ -18,32 +18,6 @@ import os, sys
 import numpy as np
 import pandas as pd
 
-class ColumnRenamer(BaseEstimator, TransformerMixin):
-    '''
-    This class renames the columns to avoid accidental space at the end of column names
-    '''
-    def __init__(self):
-        pass
-
-    def fit(self, X, y=None):
-        try:
-            logging.info("Renaming columns to avoid spaces")
-            self. X = X
-            for column in X.columns:
-                self.X.rename(columns = {column:column.strip()}, inplace = True)
-            return self
-        except Exception as e:
-            raise ConcreteException(e, sys) from e
-
-    def transform(self, X, y=None):
-        return self.X
-        
-
-    def fit_transform(self, X, y=None):
-        self.fit(X, y=None)
-        return self.transform(X, y=None)
-
-
 class OutlierImputer(BaseEstimator, TransformerMixin):
     '''
     This class extends the functionality of KNNImputer to handle outliers.
@@ -150,8 +124,8 @@ class DataTransformation:
                 ('outlier_imputer', OutlierImputer()),
                 ('nan_imputer', KNNImputer(n_neighbors = 3)),
                 ('log_transformation', FunctionTransformer(np.log1p)),
-                ('cluster_generator', ClusterGenerator()),
                 ('std_scaler', StandardScaler()),
+                ('cluster_generator', ClusterGenerator())                
             ])
 
             preprocessing = ColumnTransformer([
@@ -177,24 +151,30 @@ class DataTransformation:
 
             target_column_name = self.dataset_schema[SCHEMA_FILE_TARGET_COLUMNS]
 
-            logging.info(f"Splitting input and target feature from training testing dataframe.")
+            logging.info(f"Splitting input and target feature from training dataframe.")
             input_feature_train_df = train_df.drop(columns=[target_column_name],axis=1)
             target_feature_train_df = train_df[target_column_name]
+            input_columns = list(input_feature_train_df.columns)
 
-            logging.info(f"Applying preprocessing object on training dataframe dataframe")
+            logging.info(f"Applying preprocessing object on input features dataframe")
             input_feature_train_arr=preprocessing_obj.fit_transform(input_feature_train_df)
+            
+            logging.info(f"Stitching back training data frame.")
+            input_columns.append('cluster')
+            train_df = pd.DataFrame(input_feature_train_arr, columns= input_columns)
+            train_df[target_column_name] = target_feature_train_df
+            
 
-            train_arr = np.c_[ input_feature_train_arr, np.array(target_feature_train_df)]
             transformed_train_dir = self.data_transformation_config.transformed_train_dir
+            os.makedirs(transformed_train_dir, exist_ok=True)
 
-            train_file_name = os.path.basename(train_file_path).replace(".csv",".npz")
+            train_file_name = os.path.basename(train_file_path)
 
             transformed_train_file_path = os.path.join(transformed_train_dir, train_file_name)
 
-            logging.info(f"Saving transformed training array.")
+            logging.info(f"Saving transformed training data at {transformed_train_file_path}")
             
-            save_numpy_array_data(file_path=transformed_train_file_path,array=train_arr)
-
+            train_df.to_csv(transformed_train_file_path, index=False, header=True)
             preprocessing_obj_file_path = self.data_transformation_config.preprocessed_object_file_path
 
             logging.info(f"Saving preprocessing object.")
