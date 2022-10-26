@@ -31,7 +31,7 @@ class ConcreteStrengthEstimatorModel:
         """
         logging.debug(f"Input data sample: {X.iloc[1]}")
         transformed_feature = self.preprocessing_object.transform(X)
-        logging.info(f"Data Transformed. Sample Data: {transformed_feature[1]}")
+        logging.debug(f"Data Transformed.")
         input_columns = list(X.columns)
         input_columns.append('cluster')
         logging.debug(f"Transformed Columns {input_columns}")
@@ -41,8 +41,7 @@ class ConcreteStrengthEstimatorModel:
         logging.debug(f"Get cluster specific data for cluster {self.cluster}")
         # Prepare the feature columns by removing cluster column
         cluster_X = cluster_X[cluster_X.columns[:-1]]
-        logging.debug(f"Remove cluster column {cluster_X.columns}")
-        logging.info(f"Start prediction for cluster {self.cluster}")
+        logging.debug(f"Remove cluster column {cluster_X.columns}")        
         return self.trained_model_object.predict(cluster_X), cluster_X.index
 
     def __repr__(self):
@@ -64,7 +63,7 @@ class ModelTrainer:
     def __init__(self, model_trainer_config : ModelTrainerConfig,
      data_transformation_artifact : DataTransformationArtifact):
         try:
-            logging.info(f"{'*'*20}Model Trainer log started{'*'*20}")
+            logging.info(f"\n{'*'*20}Model Trainer log started{'*'*20}")
             self.model_trainer_config = model_trainer_config
             self.data_transformation_artifact = data_transformation_artifact
         except Exception as e:
@@ -72,14 +71,14 @@ class ModelTrainer:
 
     def initiate_model_trainer(self)->ModelTrainerArtifact:
         try:
-            logging.info(f"Loading transformed training dataset")
+            logging.debug(f"Loading transformed training dataset")
             transformed_train_file_path = self.data_transformation_artifact.transformed_train_file_path
             train_df = pd.read_csv(transformed_train_file_path)
 
-            logging.info(f"Extracting model config file path")
+            logging.debug(f"Extracting model config file path")
             model_config_file_path = self.model_trainer_config.model_config_file_path
 
-            logging.info(f"Initializing model factory class using above model config file: {model_config_file_path}")
+            logging.debug(f"Initializing model factory class using above model config file: {model_config_file_path}")
             model_factory = ModelFactory(model_config_path=model_config_file_path)  
 
             logging.info("Initializing models from config file")
@@ -100,7 +99,7 @@ class ModelTrainer:
                 cluster_features = cluster_data[train_df.columns[:-2]]
                 cluster_label= cluster_data[train_df.columns[-1]]
                 #getting the best model for each of the clusters  
-                logging.info(f"{'#'*20}Training for cluster {cluster}{'#'*20}")  
+                logging.info(f"\n{'#'*20}Training for cluster {cluster}{'#'*20}")  
                 best_model, grid_searched_best_model_list = model_factory.get_best_model(X=cluster_features,y=cluster_label,base_accuracy=base_accuracy)
                 logging.info(f"Best model for cluster {cluster}: {best_model.model} with score {best_model.best_score}")
                                       
@@ -108,7 +107,7 @@ class ModelTrainer:
                 logging.info(f"Evaluating all trained model on training dataset by Kfold cv")
                 metric_info:MetricInfoArtifact = evaluate_regression_model(model_list=model_list,X_train=cluster_features,y_train=cluster_label, flag =2, base_accuracy=base_accuracy)
 
-                logging.info(f"Best found model: {metric_info.model_name}")
+                logging.info(f"Over all best model: {metric_info.model_name}")
                 
                 preprocessing_obj=  load_object(file_path=self.data_transformation_artifact.preprocessed_object_file_path)
                 model_object = metric_info.model_object
@@ -141,4 +140,4 @@ class ModelTrainer:
         """
         Acts as destructor. Called before all references to the class object are deleted.
         """
-        logging.info(f"{'*' *25} Model Trainer log completed {'*' *25}")
+        logging.info(f"{'*' *25} Model Trainer log completed {'*' *25}\n")

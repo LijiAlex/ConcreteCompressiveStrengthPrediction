@@ -14,7 +14,7 @@ class DataIngestion:
 
     def __init__(self, data_ingestion_config:DataIngestionConfig) -> None:
         try:
-            logging.info(f"{'*'*20}Data Ingestion started{'*'*20}")
+            logging.info(f"\n{'*'*20}Data Ingestion started{'*'*20}")
             self.data_ingestion_config = data_ingestion_config
         except Exception as e:
             raise ConcreteException(e, sys) from e
@@ -38,14 +38,14 @@ class DataIngestion:
             dataset_name = self.data_ingestion_config.dataset_name
             dataset_filename = self.data_ingestion_config.dataset_filename
 
-            logging.info(f"Downloading file [{dataset_filename}] from [{dataset_name}] into [{raw_data_dir}]")
+            logging.debug(f"Downloading file [{dataset_filename}] from [{dataset_name}] into [{raw_data_dir}]")
             api.dataset_download_file(dataset = dataset_name, file_name = dataset_filename, path = raw_data_dir)
             raw_data_file_path = os.path.join(raw_data_dir,dataset_filename)
             logging.info(f"Download completed. File {raw_data_file_path} downloaded successfully")
             train_file_path = os.path.join(self.data_ingestion_config.ingested_train_dir,
                                             dataset_filename)
             # create folders and save data
-            logging.info(f"Exporting training data to [{train_file_path}] after removing space in columns")
+            logging.debug(f"Exporting training data to [{train_file_path}] after removing space in columns")
             os.makedirs(self.data_ingestion_config.ingested_train_dir, exist_ok=True)
             raw_data = pd.read_csv(raw_data_file_path)
             for column in raw_data.columns:

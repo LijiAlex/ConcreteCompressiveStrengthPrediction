@@ -53,7 +53,7 @@ def evaluate_regression_model(model_list: list, X_train, y_train, flag: int, bas
                 y_train_pred = model.predict(X_train)
                 model_obj = model
 
-            logging.info(f"{'>>'*10}Started evaluating model: [{model_name}] {'<<'*10}")
+            logging.info(f"{'.'*10}Evaluating model: [{model_name}] {'.'*10}")
             #Calculating r squared score on training testing dataset
             train_acc = r2_score(y_train, y_train_pred)
             
@@ -65,14 +65,13 @@ def evaluate_regression_model(model_list: list, X_train, y_train, flag: int, bas
             model_accuracy:float = scores.mean()
             
             #logging all important metric
-            logging.info(f"Train Score\t\t Average Score")
-            logging.info(f"{train_acc}\t\t{model_accuracy}")
+            logging.debug(f"Train Score\t\t Average Score\t\t Loss(rmse)")
+            logging.debug(f"{train_acc}\t\t{model_accuracy}\t\t{train_rmse}")
 
-            logging.info(f" Loss ->Train root mean squared error: [{train_rmse}]")
 
 
             #if model accuracy is greater than base accuracy we will accept that model as accepted model
-            logging.info(f"{model_accuracy} >= {base_accuracy} = {model_accuracy >= base_accuracy}")
+            logging.debug(f"{model_accuracy} >= {base_accuracy} = {model_accuracy >= base_accuracy}")
             if model_accuracy >= base_accuracy:
                 base_accuracy = model_accuracy
                 metric_info_artifact = MetricInfoArtifact(model_name=model_name,
@@ -82,7 +81,7 @@ def evaluate_regression_model(model_list: list, X_train, y_train, flag: int, bas
                                                         model_accuracy=model_accuracy,
                                                         index_number=index_number)
 
-                logging.info(f"Acceptable model found: {metric_info_artifact}. ")
+                logging.info(f"Acceptable model : {metric_info_artifact}. ")
             index_number += 1
         if metric_info_artifact is None:
             logging.info(f"No model found with higher accuracy than base accuracy")
@@ -127,7 +126,7 @@ class ModelFactory:
 
             
             message = f"Training {type(supplied_model.model).__name__} Started."
-            logging.info(message)
+            logging.debug(message)
             grid_search_cv.fit(input_feature, output_feature)
             grid_searched_best_model = GridSearchedBestModel(model_serial_number=supplied_model.model_serial_number,
                                                              model=supplied_model.model,
@@ -135,9 +134,7 @@ class ModelFactory:
                                                              best_parameters=grid_search_cv.best_params_,
                                                              best_score=grid_search_cv.best_score_
                                                              )
-            logging.info(f"Best score: {grid_search_cv.best_score_}, Best Parameters: {grid_search_cv.best_params_}")
-            message = f"Training {type(supplied_model.model).__name__} Ended."
-            logging.info(message)
+            logging.debug(f"Best score: {grid_search_cv.best_score_}, Best Parameters: {grid_search_cv.best_params_}")
             return grid_searched_best_model
         except Exception as e:
             raise ConcreteException(e, sys) from e
@@ -149,7 +146,7 @@ class ModelFactory:
         """
         try:
             supplied_model_list = []
-            logging.info("Getting supplied model details")
+            logging.debug("Getting supplied model details")
             for model_index in self.supplied_models.keys():
                 model_initialization_config = self.supplied_models[model_index]
                 model_obj_ref = class_for_name(module_name=model_initialization_config[MODEL_CONFIG_MODULE_KEY],
@@ -203,7 +200,7 @@ class ModelFactory:
                                                           ) -> ClusterModelDetails:
         try:
             best_model = None
-            logging.info(f"Looking for best model based on score")
+            logging.debug(f"Looking for best model based on score")
             for grid_searched_best_model in grid_searched_best_model_list:
                 logging.info(f"Model: {type(grid_searched_best_model.model).__name__}-> Score: {grid_searched_best_model.best_score}")
                 if base_accuracy < grid_searched_best_model.best_score:

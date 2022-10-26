@@ -22,7 +22,7 @@ class DataValidation:
         data_ingestion_artifact:DataIngestionArtifact
         """
         try:
-            logging.info(f"{'*'*20}Data Validation{'*'*20}")
+            logging.info(f"\n{'*'*20}Data Validation{'*'*20}")
             self.data_validation_config = data_validation_config
             self.data_ingestion_artifact = data_ingestion_artifact
         except Exception as e:
@@ -33,7 +33,7 @@ class DataValidation:
             """
             Checks if input file exists
             """
-            logging.info(f"Checking if input file exists")
+            logging.debug(f"Checking if input file exists")
             is_file_exists = False
 
             is_file_exists = os.path.exists(self.data_ingestion_artifact.train_file_path)
@@ -57,12 +57,12 @@ class DataValidation:
             logging.info(f"Reading schema file: {schema_file_path}")    
             schema_info = read_yaml_file(file_path = schema_file_path)
             schema_columns = OrderedDict(sorted(schema_info["columns"].items()))
-            logging.info(f"Schema Info: {schema_columns}")
+            logging.debug(f"Schema Info: {schema_columns}")
             input_data = pd.read_csv(self.data_ingestion_artifact.train_file_path)  
-            logging.info(f"Data Columns: {input_data.columns.sort_values()}")         
+            logging.debug(f"Data Columns: {input_data.columns.sort_values()}")         
             if len(schema_columns) == input_data.shape[1]:
-                logging.info(f"Validated no. of columns: {input_data.shape[1]}")
-                logging.info("Validating columns and types")
+                logging.debug(f"Validated no. of columns: {input_data.shape[1]}")
+                logging.debug("Validating columns and types")
                 for data_col, schema_col in zip(input_data.columns.sort_values(), schema_columns.keys()):
                     if str.strip(data_col)==str.strip(schema_col):
                         if not(np.issubdtype(input_data[data_col].dtype, np.dtype(schema_columns[schema_col]))):
@@ -89,6 +89,7 @@ class DataValidation:
                 is_validated = True,
                 message = "Data Validation Performed Successfully"
             )
+            logging.info(f"data_validation_artifact: {data_validation_artifact}")
             return data_validation_artifact
         except Exception as e:
             raise ConcreteException(e, sys) from e
