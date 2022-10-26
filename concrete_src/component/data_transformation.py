@@ -87,7 +87,7 @@ class ClusterGenerator(BaseEstimator, TransformerMixin):
             kmeans = KMeans(n_clusters=self.number_of_clusters, init='k-means++', random_state=42)
             clusters = kmeans.fit_predict(data) #  divide data into clusters
             data = pd.DataFrame(data)
-            data['cluster']=clusters  # create a new column in dataset for storing the cluster information
+            data['cluster']=clusters.astype(int)  # create a new column in dataset for storing the cluster information
             logging.info(f"Clusters created.Unique clusters: {data['cluster'].unique()}")
             return data.to_numpy()
         except Exception as e:
@@ -174,6 +174,7 @@ class DataTransformation:
 
             logging.info(f"Saving transformed training data at {transformed_train_file_path}")
             
+            train_df= train_df.astype({'cluster': int})
             train_df.to_csv(transformed_train_file_path, index=False, header=True)
             preprocessing_obj_file_path = self.data_transformation_config.preprocessed_object_file_path
 

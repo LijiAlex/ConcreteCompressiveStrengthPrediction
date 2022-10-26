@@ -3,6 +3,7 @@ import numpy as np
 from pyexpat import model
 from cmath import log
 from typing import List, Tuple
+import pandas as pd
 
 from sklearn.metrics import r2_score,mean_squared_error
 from sklearn.model_selection import cross_val_score
@@ -15,7 +16,7 @@ from concrete_src.entity.model_entity import *
 from concrete_src.util.model_factory_util import *
 
 
-def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.ndarray, base_accuracy:float=0.6) -> MetricInfoArtifact:
+def evaluate_regression_model(model_list: list, X_train, y_train, flag: int, base_accuracy:float=0.25) -> MetricInfoArtifact:
     """
     Description:
     This function compare multiple regression models and return the best model
@@ -24,6 +25,7 @@ def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.n
     model_list: List of model
     X_train: Training dataset input feature
     y_train: Training dataset target feature
+    flag: 1 if called from model_evaluation, 2 if called from model_trainer
 
     return
     It returns a named tuple    
@@ -37,13 +39,21 @@ def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.n
     
         index_number = 0
         metric_info_artifact = None
-        for model in model_list:
-            model_name = str(model)  #getting model name based on model object
-            logging.info(f"{'>>'*10}Started evaluating model: [{type(model).__name__}] {'<<'*10}")
-            
-            #Getting prediction for training dataset
-            y_train_pred = model.predict(X_train)
+        for model in model_list:            
+            if flag == 1:
+                model_name = type(model.trained_model_object).__name__ 
+                model_obj = model.trained_model_object
+                #Getting prediction for training dataset
+                y_train_pred, cluster_index = model.predict(X_train)
+                y_train = y_train.iloc[cluster_index]
+                X_train = X_train.iloc[cluster_index]
+                
+            else:
+                model_name = type(model).__name__ 
+                y_train_pred = model.predict(X_train)
+                model_obj = model
 
+            logging.info(f"{'>>'*10}Started evaluating model: [{model_name}] {'<<'*10}")
             #Calculating r squared score on training testing dataset
             train_acc = r2_score(y_train, y_train_pred)
             
@@ -51,8 +61,8 @@ def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.n
             train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred))
 
             # Model accuracy using kfold cv
-            scores = cross_val_score(model, X_train, y_train, cv = 3, n_jobs = 2, scoring = 'r2')
-            model_accuracy = scores.mean()
+            scores = cross_val_score(model_obj, X_train, y_train, cv = 3, n_jobs = 2, scoring = 'r2')
+            model_accuracy:float = scores.mean()
             
             #logging all important metric
             logging.info(f"Train Score\t\t Average Score")
@@ -62,10 +72,11 @@ def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.n
 
 
             #if model accuracy is greater than base accuracy we will accept that model as accepted model
+            logging.info(f"{model_accuracy} >= {base_accuracy} = {model_accuracy >= base_accuracy}")
             if model_accuracy >= base_accuracy:
                 base_accuracy = model_accuracy
                 metric_info_artifact = MetricInfoArtifact(model_name=model_name,
-                                                        model_object=model,
+                                                        model_object=model_obj,
                                                         train_rmse=train_rmse,
                                                         train_accuracy=train_acc,
                                                         model_accuracy=model_accuracy,

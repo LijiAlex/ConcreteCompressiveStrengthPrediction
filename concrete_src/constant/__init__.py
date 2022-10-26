@@ -60,7 +60,7 @@ MODEL_CONFIG_FILE_NAME = "model_config_file_name"
 # model evaluation config
 MODEL_EVALUATION_CONFIG_KEY = "model_evaluation_config"
 MODEL_EVALUATION_DIR = "model_evaluation"
-MODEL_EVALUATION_FILE_NAME = "model_evaluation_file_name"
+MODEL_EVALUATION_FILE_PREFIX = "model_evaluation_file_prefix"
 
 # model_evaluation.yaml
 BEST_MODEL_KEY = "best_model"

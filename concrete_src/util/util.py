@@ -1,7 +1,10 @@
+from typing import List
 import yaml, sys, os, dill
 import numpy as np
+import pandas as pd
 
 from concrete_src.exception import ConcreteException
+from concrete_src.constant import *
 
 def read_yaml_file(file_path:str)->dict:
     """
@@ -64,3 +67,65 @@ def load_object(file_path:str):
             return dill.load(file_obj)
     except Exception as e:
         raise ConcreteException(e,sys) from e
+
+def write_yaml_file(file_path:str,data:dict=None):
+    """
+    Create yaml file 
+    file_path: str
+    data: dict
+    """
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path,"w") as yaml_file:
+            if data is not None:
+                yaml.dump(data,yaml_file)
+    except Exception as e:
+        raise ConcreteException(e,sys)
+
+def load_data(file_path: str, schema_file_path: str) -> pd.DataFrame:
+    """
+    Reads csv file and checks if it is as per schema
+    file_path: Path of input file
+    schema_file_path: Path of schema file
+    """
+    try:
+        datatset_schema = read_yaml_file(schema_file_path)
+
+        schema = datatset_schema[SCHEMA_FILE_COLUMNS_KEY]
+
+        dataframe = pd.read_csv(file_path)
+
+        error_messgae = ""
+
+
+        for column in dataframe.columns:
+            if column in list(schema.keys()):
+                dataframe[column].astype(schema[column])
+            else:
+                error_messgae = f"{error_messgae} \nColumn: [{column}] is not in the schema."
+        if len(error_messgae) > 0:
+            raise Exception(error_messgae)
+        return dataframe
+
+    except Exception as e:
+        raise ConcreteException(e,sys) from e
+
+def get_cluster(file_path: str)->int:
+    """
+    Returns the cluster associated with the model file.
+    Model file format: 'model_cluster'+<cluster>+'.pkl'    
+    """
+    try:
+        file_name = os.path.basename(file_path)
+        return int(file_name[-5:-4])
+        
+    except Exception as e:
+        raise ConcreteException(e,sys) from e
+
+def create_list(size:int)->List:
+    """
+    Creates an empty list of size specified.
+    Input:
+    size: size of list
+    """
+    return [None]*size

@@ -109,6 +109,22 @@ class Configuration:
         except Exception as e:
             raise ConcreteException(e, sys) from e
 
+    def get_model_evaluation_config(self)->ModelEvaluationConfig:
+        model_evaluation_config_info = self.config_info[MODEL_EVALUATION_CONFIG_KEY]
+        model_evaluation_file_prefix = model_evaluation_config_info[MODEL_EVALUATION_FILE_PREFIX]
+        artifact_dir = os.path.join(self.training_pipeline_config.artifact_dir,
+                                        MODEL_EVALUATION_DIR)
+        try:
+            model_evaluation_config_info = ModelEvaluationConfig(
+                model_evaluation_files_folder = artifact_dir, 
+                model_evaluation_file_prefix = model_evaluation_file_prefix,
+                time_stamp = self.time_stamp
+            )
+            logging.info(f"ModelEvaluationConfig: {model_evaluation_config_info}")
+            return model_evaluation_config_info
+        except Exception as e:
+            raise ConcreteException(e, sys) from e
+
     def get_model_train_config(self)->ModelTrainerConfig:
         """
         Reads model trainer configuration details

@@ -13,7 +13,7 @@ from typing import List
 import pandas as pd
 
 class ConcreteStrengthEstimatorModel:
-    def __init__(self, preprocessing_object, trained_model_object):
+    def __init__(self, cluster, preprocessing_object, trained_model_object):
         """
         Train Model constructor
         preprocessing_object: preprocessing_object
@@ -21,15 +21,29 @@ class ConcreteStrengthEstimatorModel:
         """
         self.preprocessing_object = preprocessing_object
         self.trained_model_object = trained_model_object
+        self.cluster = cluster
 
-    def predict(self, X):
+    def predict(self, X:pd.DataFrame):
         """
         function accepts raw inputs and then transformed raw input using preprocessing_object
         which gurantees that the inputs are in the same format as the training data
         At last it perform prediction on transformed features
         """
+        logging.debug(f"Input data sample: {X.iloc[1]}")
         transformed_feature = self.preprocessing_object.transform(X)
-        return self.trained_model_object.predict(transformed_feature)
+        logging.info(f"Data Transformed. Sample Data: {transformed_feature[1]}")
+        input_columns = list(X.columns)
+        input_columns.append('cluster')
+        logging.debug(f"Transformed Columns {input_columns}")
+        train_df = pd.DataFrame(transformed_feature, columns= input_columns)
+        logging.debug(f"DataFrame Created")
+        cluster_X=train_df[train_df['cluster']==self.cluster] # filter the data for the current cluster
+        logging.debug(f"Get cluster specific data for cluster {self.cluster}")
+        # Prepare the feature columns by removing cluster column
+        cluster_X = cluster_X[cluster_X.columns[:-1]]
+        logging.debug(f"Remove cluster column {cluster_X.columns}")
+        logging.info(f"Start prediction for cluster {self.cluster}")
+        return self.trained_model_object.predict(cluster_X), cluster_X.index
 
     def __repr__(self):
         return f"{type(self.trained_model_object).__name__}()"
@@ -75,10 +89,10 @@ class ModelTrainer:
             logging.info(f"Expected accuracy: {base_accuracy}")
 
             all_clusters = list(train_df['cluster'].unique())
-            trained_models_file_path = list()
-            train_rmse_list = list()
-            train_accuracy_list = list()
-            model_accuracy_list = list()
+            trained_models_file_path = create_list(len(all_clusters))
+            train_rmse_list = create_list(len(all_clusters))
+            train_accuracy_list = create_list(len(all_clusters))
+            model_accuracy_list = create_list(len(all_clusters))
 
             for cluster in all_clusters:
                 cluster_data=train_df[train_df['cluster']==cluster] # filter the data for one cluster
@@ -92,7 +106,7 @@ class ModelTrainer:
                                       
                 model_list = [grid_searched_model.best_model for grid_searched_model in grid_searched_best_model_list ]
                 logging.info(f"Evaluating all trained model on training dataset by Kfold cv")
-                metric_info:MetricInfoArtifact = evaluate_regression_model(model_list=model_list,X_train=cluster_features,y_train=cluster_label,base_accuracy=base_accuracy)
+                metric_info:MetricInfoArtifact = evaluate_regression_model(model_list=model_list,X_train=cluster_features,y_train=cluster_label, flag =2, base_accuracy=base_accuracy)
 
                 logging.info(f"Best found model: {metric_info.model_name}")
                 
@@ -103,13 +117,13 @@ class ModelTrainer:
                 trained_models_path=self.model_trainer_config.trained_models_path
                 trained_model_file_name = 'model_cluster'+str(cluster)+'.pkl'
                 trained_model_file_path = os.path.join(trained_models_path, trained_model_file_name)
-                trained_models_file_path.append(trained_model_file_path)
-                concrete_strength_estimator_model = ConcreteStrengthEstimatorModel(preprocessing_object=preprocessing_obj,trained_model_object=model_object)
-                logging.info(f"Saving model at path: {trained_model_file_path}")
+                trained_models_file_path[cluster] = trained_model_file_path
+                concrete_strength_estimator_model = ConcreteStrengthEstimatorModel(cluster=cluster, preprocessing_object=preprocessing_obj,trained_model_object=model_object)
+                logging.info(f"Saving model {concrete_strength_estimator_model} at path: {trained_model_file_path}")
                 save_object(file_path=trained_model_file_path,obj=concrete_strength_estimator_model)
-                train_rmse_list.append(metric_info.train_rmse)
-                train_accuracy_list.append(metric_info.train_accuracy)
-                model_accuracy_list.append(metric_info.model_accuracy)
+                train_rmse_list[cluster] = metric_info.train_rmse
+                train_accuracy_list[cluster] = metric_info.train_accuracy
+                model_accuracy_list[cluster] = metric_info.model_accuracy
 
             model_trainer_artifact=  ModelTrainerArtifact(is_trained=True,message="Model Trained successfully",
                 clusters = all_clusters,
