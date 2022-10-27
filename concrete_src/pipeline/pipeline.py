@@ -9,6 +9,7 @@ from concrete_src.component.data_validation import DataValidation
 from concrete_src.component.data_transformation import DataTransformation
 from concrete_src.component.model_trainer import ModelTrainer
 from concrete_src.component.model_evaluation import ModelEvaluation
+from concrete_src.component.model_pusher import ModelPusher
 
 class Pipeline:
     def __init__(self, config: Configuration ) -> None:
@@ -31,7 +32,12 @@ class Pipeline:
                 model_evaluation_artifact = self.start_model_evaluation(data_ingestion_artifact=data_ingestion_artifact,
                                                                      data_validation_artifact=data_validation_artifact,
                                                                      model_trainer_artifact=model_trainer_artifact)
-
+                if True in model_evaluation_artifact.is_models_accepted:
+                    model_pusher_artifact = self.start_model_pusher(model_eval_artifact=model_evaluation_artifact)
+                    logging.info(f'Model pusher artifact: {model_pusher_artifact}')
+                else:
+                    logging.info("Trained models rejected. Models not pushed")
+                logging.info("Pipeline completed.")
         except Exception as e:
                 raise ConcreteException(e, sys) from e
 
@@ -87,9 +93,19 @@ class Pipeline:
         except Exception as e:
             raise ConcreteException(e, sys) from e
 
+    def start_model_pusher(self, model_eval_artifact: ModelEvaluationArtifact) -> ModelPusherArtifact:
+        try:
+            model_pusher = ModelPusher(
+                model_pusher_config=self.config.get_model_pusher_config(),
+                model_evaluation_artifact=model_eval_artifact
+            )
+            return model_pusher.initiate_model_pusher()
+        except Exception as e:
+            raise ConcreteException(e, sys) from e
+
 
     def __del__(self):
         """
         Acts as destructor. Called before all references to the class object are deleted.
         """
-        logging.info(f"{'*' *25} Pipeline completed {'*' *25}\n")
+        logging.info(f"{'*' *25} Pipeline log completed {'*' *25}\n")

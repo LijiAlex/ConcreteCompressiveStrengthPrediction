@@ -99,7 +99,7 @@ class ModelTrainer:
                 cluster_features = cluster_data[train_df.columns[:-2]]
                 cluster_label= cluster_data[train_df.columns[-1]]
                 #getting the best model for each of the clusters  
-                logging.info(f"\n{'#'*20}Training for cluster {cluster}{'#'*20}")  
+                logging.info(f"\n\t\t{'#'*20}Training for cluster {cluster}{'#'*20}")  
                 best_model, grid_searched_best_model_list = model_factory.get_best_model(X=cluster_features,y=cluster_label,base_accuracy=base_accuracy)
                 logging.info(f"Best model for cluster {cluster}: {best_model.model} with score {best_model.best_score}")
                                       
@@ -140,4 +140,4 @@ class ModelTrainer:
         """
         Acts as destructor. Called before all references to the class object are deleted.
         """
-        logging.info(f"{'*' *25} Model Trainer log completed {'*' *25}\n")
+        logging.info(f"\t{'*' *25} Model Trainer log completed {'*' *25}\n")

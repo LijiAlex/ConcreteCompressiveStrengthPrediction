@@ -125,6 +125,18 @@ class Configuration:
         except Exception as e:
             raise ConcreteException(e, sys) from e
 
+    def get_model_pusher_config(self)->ModelPusherConfig:
+        try:
+            time_stamp = f"{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            model_pusher_config_info = self.config_info[MODEL_PUSH_CONFIG_INFO_KEY]
+            export_dir_path = os.path.join(ROOT_DIR, model_pusher_config_info[MODEL_EXPORT_DIR],
+                                           time_stamp)
+            model_pusher_config = ModelPusherConfig(export_dir_path=export_dir_path)
+            logging.info(f"Model pusher config {model_pusher_config}")
+            return model_pusher_config            
+        except Exception as e:
+            raise ConcreteException(e, sys) from e
+
     def get_model_train_config(self)->ModelTrainerConfig:
         """
         Reads model trainer configuration details

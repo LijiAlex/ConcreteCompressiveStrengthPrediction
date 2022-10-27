@@ -195,4 +195,4 @@ class DataTransformation:
         """
         Acts as destructor. Called before all references to the class object are deleted.
         """
-        logging.info(f"{'*' *25} Data Transformation log completed {'*' *25}\n")
+        logging.info(f"\n{'*' *25} Data Transformation log completed {'*' *25}\n")
