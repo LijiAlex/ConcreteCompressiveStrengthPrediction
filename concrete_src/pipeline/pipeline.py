@@ -1,4 +1,6 @@
 import os, sys
+import uuid
+from threading import Thread
 
 from concrete_src.config.configuartion import Configuration
 from concrete_src.exception import ConcreteException
@@ -10,34 +12,55 @@ from concrete_src.component.data_transformation import DataTransformation
 from concrete_src.component.model_trainer import ModelTrainer
 from concrete_src.component.model_evaluation import ModelEvaluation
 from concrete_src.component.model_pusher import ModelPusher
+from concrete_src.entity.experiment import ExperimentDetails, Experiment
 
-class Pipeline:
+
+class Pipeline(Thread):
+
     def __init__(self, config: Configuration ) -> None:
-        try:
-            os.makedirs(config.training_pipeline_config.artifact_dir, exist_ok=True)
+        try:            
             self.config = config
+            self.experiment = Experiment(config.training_pipeline_config.artifact_dir, config.time_stamp)            
+            super().__init__(daemon=False, name="pipeline")
         except Exception as e:
             raise ConcreteException(e, sys) from e
 
     def run_pipeline(self):
         try:
-                logging.info(f"{'*'*20}Pipeline starting{'*'*20}\n")
-                data_ingestion_artifact = self.start_data_ingestion()
-                data_validation_artifact = self.start_data_validation(data_ingestion_artifact)
-                data_transformation_artifact = self.start_data_transformation(
-                    data_ingestion_artifact=data_ingestion_artifact,
-                    data_validation_artifact=data_validation_artifact
-                )
-                model_trainer_artifact = self.start_model_trainer(data_transformation_artifact=data_transformation_artifact)
-                model_evaluation_artifact = self.start_model_evaluation(data_ingestion_artifact=data_ingestion_artifact,
-                                                                     data_validation_artifact=data_validation_artifact,
-                                                                     model_trainer_artifact=model_trainer_artifact)
-                if True in model_evaluation_artifact.is_models_accepted:
-                    model_pusher_artifact = self.start_model_pusher(model_eval_artifact=model_evaluation_artifact)
-                    logging.info(f'Model pusher artifact: {model_pusher_artifact}')
-                else:
-                    logging.info("Trained models rejected. Models not pushed")
-                logging.info("Pipeline completed.")
+            if self.experiment.current_experiment!=None and self.experiment.current_experiment.running_status:
+                msg:str = "Pipeline already running"
+                logging.info(msg)
+                return self.experiment
+
+            logging.info(f"{'*'*20}Pipeline starting{'*'*20}\n")
+            self.experiment.start_experiment("Pipeline has been started.")
+            logging.info(f"Pipeline experiment: {self.experiment.current_experiment}")
+
+            self.experiment.save_experiment()
+
+            data_ingestion_artifact = self.start_data_ingestion()
+            data_validation_artifact = self.start_data_validation(data_ingestion_artifact)
+            data_transformation_artifact = self.start_data_transformation(
+                data_ingestion_artifact=data_ingestion_artifact,
+                data_validation_artifact=data_validation_artifact
+            )
+            model_trainer_artifact = self.start_model_trainer(data_transformation_artifact=data_transformation_artifact)
+            model_evaluation_artifact = self.start_model_evaluation(data_ingestion_artifact=data_ingestion_artifact,
+                                                                    data_validation_artifact=data_validation_artifact,
+                                                                    model_trainer_artifact=model_trainer_artifact)
+            if True in model_evaluation_artifact.is_models_accepted:
+                model_pusher_artifact = self.start_model_pusher(model_eval_artifact=model_evaluation_artifact)
+                logging.info(f'Model pusher artifact: {model_pusher_artifact}')
+            else:
+                logging.info("Trained models rejected. Models not pushed")
+            logging.info("Pipeline completed.")
+
+            msg = "Pipeline has been completed."
+
+            self.experiment.stop_experiment(msg = msg, is_model_accepted = model_evaluation_artifact.is_models_accepted,
+             model_accuracy = model_trainer_artifact.model_accuracy)
+            logging.info(f"Pipeline experiment: {self.experiment.current_experiment}")
+            self.experiment.save_experiment()
         except Exception as e:
                 raise ConcreteException(e, sys) from e
 
