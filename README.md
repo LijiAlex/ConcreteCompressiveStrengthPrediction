@@ -19,7 +19,7 @@ Supervised prediction system that estimates the strength of the concrete given t
 * Heroku
 
 ## Training pipeline
-![alt text] https://github.com/LijiAlex/ConcreteCompressiveStrengthPrediction/blob/main/FlowDiagram/Training%20Pipeline.jpg
+![Training Pipeline](https://user-images.githubusercontent.com/59106185/200120386-2d8a2da6-1c1c-4fee-a710-a17421ed4d70.jpg)
 
 ## Salient Features
 
