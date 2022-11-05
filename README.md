@@ -8,17 +8,18 @@ The quality of concrete is determined by its compressive strength, which is meas
 
 Save waiting time on strength test. 
 
-## Model Design
+## Proposed Design
 
-* Supervised 
-* Multivariate 
-* Cluster Classification
-* Outlier Removal
+Supervised prediction system that estimates the strength of the concrete given the mixture composition
 
-## Performance Measure
+## Tech stack used
+* Python
+* Flask
+* ML algorithms
+* Heroku
 
-* R<sup>2
-* RMSE
+## Training pipeline
+![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
 
 ## Salient Features
 
@@ -29,18 +30,23 @@ Save waiting time on strength test.
 * Use seperate thread for training purpose.
 * Integrated UI.
 * Logs for debugging.
+* Custom exception.
 
-### Pipeline Components
+## Feature engineering steps
 
-* Data Ingestion
-* Data Validation
-* Data Transformation
-* Model Training
-* Model Evaluation
-* Model Push
+* Outlier removal
+* Normalization
+* Standardization
+* Clusterification
 
-### Exception
-ConcreteException: Custom exception for the project
+## Performance Measure
+
+* R<sup>2
+* RMSE
+
+
+
+
 
 
 
